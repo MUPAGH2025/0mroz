@@ -47,6 +47,21 @@ jobs:
             --output=raport.tex \
             kelvin.ipynb
 
+      - name: Fix LaTeX encoding (utf8x -> utf8)
+        run: |
+          python - << 'EOF'
+          import io, pathlib
+          path = pathlib.Path("raport.tex")
+          tex = path.read_text(encoding="utf-8")
+
+          # usuń ucs i zmień utf8x na zwykłe utf8
+          tex = tex.replace(r"\usepackage{ucs}", r"% \usepackage{ucs} (disabled)")
+          tex = tex.replace(r"\usepackage[utf8x]{inputenc}", r"\usepackage[utf8]{inputenc}")
+          tex = tex.replace(r"\usepackage{hyperref}", r"\usepackage[unicode]{hyperref}")
+
+          path.write_text(tex, encoding="utf-8")
+          EOF
+
       - name: Compile LaTeX to PDF
         run: |
           pdflatex raport.tex
