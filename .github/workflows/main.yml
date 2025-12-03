@@ -47,10 +47,11 @@ jobs:
             --output=raport.tex \
             kelvin.ipynb
 
-      - name: Fix LaTeX encoding (utf8x -> utf8)
+
+      - name: Fix LaTeX encoding (utf8x -> utf8) and set PDF title
         run: |
           python - << 'EOF'
-          import io, pathlib
+          import pathlib
           path = pathlib.Path("raport.tex")
           tex = path.read_text(encoding="utf-8")
 
@@ -59,8 +60,19 @@ jobs:
           tex = tex.replace(r"\usepackage[utf8x]{inputenc}", r"\usepackage[utf8]{inputenc}")
           tex = tex.replace(r"\usepackage{hyperref}", r"\usepackage[unicode]{hyperref}")
 
-          path.write_text(tex, encoding="utf-8")
-          EOF
+          # wstrzyknięcie tytułu i metadanych PDF przed \begin{document}
+          insert = r"""
+          \title{Symulacja brzegowej fali Kelvina w przybliżeniu płytkiej wody}
+          \author{Piotr Mróz}
+          \hypersetup{
+              pdftitle={Symulacja brzegowej fali Kelvina w przybliżeniu płytkiej wody},
+              pdfauthor={Piotr Mróz}
+          }
+          """
+              tex = tex.replace(r"\begin{document}", insert + "\n\\begin{document}")
+
+              path.write_text(tex, encoding="utf-8")
+              EOF
 
       - name: Compile LaTeX to PDF
         run: |
