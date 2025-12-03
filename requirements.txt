@@ -1,0 +1,12 @@
+os
+numpy
+matplotlib
+open_atmos_jupyter_utils
+PyMPDATA
+jupyter
+nbconvert
+numpy
+matplotlib
+imageio
+pillow
+scipy
