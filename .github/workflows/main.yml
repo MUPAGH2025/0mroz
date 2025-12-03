@@ -23,12 +23,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Install LaTeX (tectonic)
+      - name: Install LaTeX (TeX Live)
         run: |
           sudo apt-get update
-          sudo apt-get install -y tectonic
+          sudo apt-get install -y texlive-latex-base texlive-latex-recommended texlive-latex-extra
 
-      # 1) Uruchom notebook – policzy symulacje i wygeneruje wykresy
       - name: Execute notebook
         run: |
           jupyter nbconvert \
@@ -37,7 +36,6 @@ jobs:
             --inplace \
             projekt_real.ipynb
 
-      # 2) Konwersja ipynb -> LaTeX bez kodu
       - name: Convert notebook to LaTeX
         run: |
           jupyter nbconvert \
@@ -46,10 +44,11 @@ jobs:
             --output=raport.tex \
             projekt_real.ipynb
 
-      # 3) Kompilacja LaTeX -> PDF
       - name: Compile LaTeX to PDF
         run: |
-          tectonic raport.tex
+          pdflatex raport.tex
+          pdflatex raport.tex
+
 
       # 4) Upload PDF jako artefakt
       - name: Upload report PDF
