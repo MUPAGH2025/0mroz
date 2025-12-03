@@ -34,7 +34,7 @@ jobs:
             --to notebook \
             --execute \
             --inplace \
-            projekt_real.ipynb
+            kelvin.ipynb
 
       - name: Convert notebook to LaTeX
         run: |
@@ -42,7 +42,7 @@ jobs:
             --to latex \
             --TemplateExporter.exclude_input=True \
             --output=raport.tex \
-            projekt_real.ipynb
+            kelvin.ipynb
 
       - name: Compile LaTeX to PDF
         run: |
