@@ -11,4 +11,4 @@ jobs:
             - run: python -m nbconvert --to script --execute upwind.ipynb
             - uses: actions/upload-artifact@v4
               with:
-                path: anim.gif
+                path: anim.gif anim2.gif
