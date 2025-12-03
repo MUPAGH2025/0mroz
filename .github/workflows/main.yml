@@ -52,6 +52,7 @@ jobs:
         run: |
           python - << 'EOF'
           import pathlib
+
           path = pathlib.Path("raport.tex")
           tex = path.read_text(encoding="utf-8")
 
@@ -69,10 +70,11 @@ jobs:
               pdfauthor={Piotr Mróz}
           }
           """
-              tex = tex.replace(r"\begin{document}", insert + "\n\\begin{document}")
+          tex = tex.replace(r"\begin{document}", insert + "\n\\begin{document}")
 
-              path.write_text(tex, encoding="utf-8")
-              EOF
+          path.write_text(tex, encoding="utf-8")
+          EOF
+
 
       - name: Compile LaTeX to PDF
         run: |
