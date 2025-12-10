@@ -3,9 +3,6 @@ matplotlib
 open_atmos_jupyter_utils
 PyMPDATA
 jupyter
-nbconvert
-imageio
 pillow
 scipy
-pint
 ipykernel
