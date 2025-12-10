@@ -9,6 +9,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      NOTEBOOK: kelvin.ipynb     # notebook generujący obrazki
+      REPORT_TEX: raport.tex     # plik .tex ze szkieletem sprawozdania
+      REPORT_PDF: raport.pdf
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,69 +27,38 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          # na wszelki wypadek – zapewnia jupyter/nbconvert
+          pip install jupyter
 
-      - name: Install Pandoc and LaTeX
+      - name: Install LaTeX
         run: |
           sudo apt-get update
           sudo apt-get install -y \
-            pandoc \
-            texlive-latex-base texlive-latex-recommended texlive-latex-extra
+            texlive-latex-base \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended \
+            texlive-science \
+            latexmk
 
-
-      - name: Execute notebook
+      # 1) Uruchom notebook, żeby wygenerować rysunki
+      - name: Execute notebook and generate figures
         run: |
           jupyter nbconvert \
             --to notebook \
             --execute \
             --inplace \
-            kelvin.ipynb
+            "$NOTEBOOK"
 
-      - name: Convert notebook to LaTeX
+      # 2) Skompiluj własny plik .tex ze szkieletem sprawozdania
+      - name: Compile LaTeX report
         run: |
-          jupyter nbconvert \
-            --to latex \
-            --TemplateExporter.exclude_input=True \
-            --output=raport.tex \
-            kelvin.ipynb
+          latexmk -pdf -interaction=nonstopmode -halt-on-error "$REPORT_TEX"
+          # latexmk domyślnie tworzy PDF o tej samej nazwie bazowej
 
-
-      - name: Fix LaTeX encoding (utf8x -> utf8) and set PDF title
-        run: |
-          python - << 'EOF'
-          import pathlib
-
-          path = pathlib.Path("raport.tex")
-          tex = path.read_text(encoding="utf-8")
-
-          # usuń ucs i zmień utf8x na zwykłe utf8
-          tex = tex.replace(r"\usepackage{ucs}", r"% \usepackage{ucs} (disabled)")
-          tex = tex.replace(r"\usepackage[utf8x]{inputenc}", r"\usepackage[utf8]{inputenc}")
-          tex = tex.replace(r"\usepackage{hyperref}", r"\usepackage[unicode]{hyperref}")
-
-          # wstrzyknięcie tytułu i metadanych PDF przed \begin{document}
-          insert = r"""
-          \title{Symulacja brzegowej fali Kelvina w przybliżeniu płytkiej wody}
-          \author{Piotr Mróz}
-          \hypersetup{
-              pdftitle={Symulacja brzegowej fali Kelvina w przybliżeniu płytkiej wody},
-              pdfauthor={Piotr Mróz}
-          }
-          """
-          tex = tex.replace(r"\begin{document}", insert + "\n\\begin{document}")
-
-          path.write_text(tex, encoding="utf-8")
-          EOF
-
-
-      - name: Compile LaTeX to PDF
-        run: |
-          pdflatex raport.tex
-          pdflatex raport.tex
-
-
-      # 4) Upload PDF jako artefakt
+      # 3) Wyślij PDF jako artefakt
       - name: Upload report PDF
         uses: actions/upload-artifact@v4
         with:
           name: raport-kelvin-plytka-woda
-          path: raport.pdf
+          path: ${{ env.REPORT_PDF }}
