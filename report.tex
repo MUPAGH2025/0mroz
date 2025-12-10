@@ -1,0 +1,188 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}   % <-- zmienione z utf8x
+\usepackage{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage[unicode]{hyperref}
+\usepackage{subcaption}
+
+% (tu jeszcze parę definicji środowisk od nbconvert – makra na listingi komórek, itp.)
+
+\title{Symulacja brzegowej fali Kelvina w przybliżeniu płytkiej wody}
+\author{Piotr Mróz}
+\hypersetup{
+    pdftitle={Symulacja brzegowej fali Kelvina w przybliżeniu płytkiej wody},
+    pdfauthor={Piotr Mróz}
+}
+
+\begin{document}
+
+\maketitle
+
+\section{Cel projektu}
+
+    Celem zrealizowanego projektu było numeryczne zbadanie propagacji brzegowej fali Kelvina w przybliżeniu równania płytkiej wody na prostokątnym obszarze basenu oceanicznego, a w szczególności odpowiedź na pytanie:
+    \begin{quote}
+        Czy korzystając z równań dynamiki płynu w przybliżeniu "płytkiej wody" można numerycznie odtworzyć brzegową falę Kelvina, oraz jak rozdzielczość siatki numerycznej wpływa na prędkość propagacji fali wzdłuż brzegu?
+    \end{quote}
+
+\section{Użyte równania}
+
+    W modelu płytkiej wody rozpatrujemy równania
+    
+    $$
+    \frac{\partial h}{\partial t}
+    + \frac{\partial (hu)}{\partial x}
+    + \frac{\partial (hv)}{\partial y} = 0,
+    $$
+    $$
+    \frac{\partial (hu)}{\partial t}
+    + \frac{\partial}{\partial x}
+    \left(hu^2 + \frac{1}{2} g h^2 \right)
+    + \frac{\partial (huv)}{\partial y}
+    - f hv = 0,
+    $$
+    $$
+    \frac{\partial (hv)}{\partial t}
+    + \frac{\partial (huv)}{\partial x}
+    + \frac{\partial}{\partial y}
+    \left(hv^2 + \frac{1}{2} g h^2 \right)
+    + f hu = 0,
+    $$
+    
+    gdzie $h(x,y,t)$ jest wysokością słupa cieczy,
+    $\mathbf{u} = (u,v)$ jest poziomym polem prędkości,
+    $g$ – przyspieszeniem grawitacyjnym,
+    a $f$ – parametrem Coriolisa.
+
+\section{Warunki brzegowe i początkowe}
+    
+    W symulacji rozpatrywano prostokątny basen o wymiarach $L_x,\times L_y,$ z brzegiem wzdłuż $x = 0$. Wykorzystano następujące warunki brzegowe i początkowe.
+
+    \begin{itemize}
+        \item \textbf{warunki brzegowe}
+        \begin{itemize}
+            \item sztywny brzeg wzdłuż $x = 0$:
+            \item brzegi wzdłuż osi $y$: periodyczne warunki brzegowe,
+            \item brzeg wzdłuż osi $x$ "w głębi oceanu": wygaszanie fali, tzw. "gąbka".
+        \end{itemize}
+        \item \textbf{warunek początkowy} dla wysokości: gaussian w dużej odległości od brzegu.
+    \end{itemize}
+
+\section{Parametry numeryczne}
+    
+    W symulacji wykorzystano jednorodną siatkę numeryczną $\Delta x = \Delta y = 25$ km oraz krok czasowy $\Delta t$ dobrany tak, aby spełnić warunek CFL
+    $$C = 0.4\quad \Longrightarrow\quad \Delta t = 225.76\text{ s}$$
+    Przyjęto stałą głębokość tła $H = \text{200 m}$, szerokość geograficzną $\varphi = 80^\circ$. Dla analiz wpływu rozdzielczości siatki oraz kroku czasowego wykorzystano do symulacji po trzy wartości tych parametrów. Dla każdej z nich wyznaczono prędkość propagacji fali wzdłuż brzegu.
+
+
+\section{Wyniki}
+    
+    W celu zilustrowania własności brzegowej fali Kelvina w przybliżeniu płytkiej wody na rysunkach \ref{fig:kelvin-eta2D}–\ref{fig:kelvin-hovmoller} przedstawiono zarówno strukturę przestrzenną pola wysokości swobodnej powierzchni, jak i odpowiadające jej pole prędkości oraz propagację sygnału w czasie wzdłuż linii brzegowej. Dla ustalonego czasu $t = 2.09$ dnia pokazano rozkład anomalii poziomu morza oraz skojarzone z nim pole prędkości, natomiast diagram Hovmöllera obrazuje ewolucję fali wzdłuż brzegu w całym rozważanym przedziale czasu. Na wszystkich rysunkach brzeg oceanu odpowiada współrzędnej $x=0$.
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=.9\textwidth]{kelvin_eta2D.pdf}
+        \caption{
+            Pole anomalii poziomu morza $\eta(x,y)$ w modelu płytkiej wody
+            w pobliżu pionowej linii brzegowej ($x=0$) dla czasu
+            $t = 2.09$ dnia.
+            Kolor reprezentuje odchylenie wysokości swobodnej powierzchni
+            od stanu spoczynkowego, a wyraźne maksimum w pobliżu brzegu
+            oraz stopniowe tłumienie sygnału w głąb oceanu są charakterystyczne
+            dla brzegowej fali Kelvina propagującej się wzdłuż brzegu.}
+        \label{fig:kelvin-eta2D}
+    \end{figure}
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{kelvin_uv_quiver.pdf}
+        \caption{
+            Pole wektorowe prędkości $(u,v)$ odpowiadające brzegowej fali
+            Kelvina w tym samym momencie czasu $t = 2.09$ dnia, co na
+            rysunku \ref{fig:kelvin-eta2D}.
+            Strzałki wskazują kierunek i względną wartość prędkości, przy czym
+            dominuje składowa równoległa do brzegu (wzdłuż osi $y$),
+            natomiast składowa prostopadła do brzegu jest silnie tłumiona
+            wraz ze wzrostem odległości $x$ od brzegu, zgodnie z teorią
+            brzegowej fali Kelvina.}
+        \label{fig:kelvin-uv-quiver}
+    \end{figure}
+    
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{kelvin_hovmoller.pdf}
+        \caption{
+            Diagram Hovmöllera anomalii poziomu morza $\eta(t,y)$ przy brzegu
+            ($x=0$). Na osi poziomej przedstawiono współrzędną wzdłuż brzegu
+            $y$, na osi pionowej czas, a kolor oznacza wartość $\eta$.
+            Pochyłe pasma dodatnich i ujemnych anomalii powierzchniowych
+            obrazują propagację brzegowej fali Kelvina wzdłuż brzegu
+            z prędkością zbliżoną do teoretycznej prędkości fazowej,
+            natomiast prostokątna ramka z podpisem $x=0$ podkreśla, że
+            pokazany jest wyłącznie sygnał przy samej linii brzegowej.}
+        \label{fig:kelvin-hovmoller}
+    \end{figure}
+    Na poniższym rysunku przedstawiono wyniki symulacji dla dwukrotnie zwiększonego kroku czasowego i rozdzielczości przestrzennej.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{kelvin_hovmoller_fit_dt452_dy50.pdf}
+        \caption{
+            Diagram Hovmöllera anomalii poziomu morza $\eta(t,y)$ przy brzegu ($x=0$) dla $\Delta x = 50$ km i $\Delta t =452$ s. Białe punkty obrazują automatycznie śledzony grzbiet fali Kelvina, natomiast czerwona linia jest prostą dopasowaną do środkowej części trajektorii grzbietu. Z nachylenia tej prostej wyznaczono numeryczną prędkość fali $|c_{\mathrm{num}}| = 43.121\,\mathrm{m\cdot s^{-1}}$, co odpowiada relacji $|c_{\mathrm{num}}|/c = 0.974$ względem prędkości teoretycznej $c=\sqrt{gH}$.
+        }
+        \label{fig:kelvin-hovmoller-fit}
+    \end{figure}
+
+    Aby ocenić zbieżność numerycznego wyznaczania prędkości brzegowej fali Kelvina przeprowadzono osobno analizę wpływu kroku czasowego oraz rozdzielczości przestrzennej siatki numerycznej. Na rysunku \ref{fig:kelvin-time-convergence} przedstawiono zależność ilorazu $c_{\mathrm{num}}/c$ od kroku czasowego $\Delta t$ dla kilku wartości parametru $f_t$, natomiast rysunek \ref{fig:kelvin-space-convergence} pokazuje, jak ten sam iloraz zmienia się w funkcji bezwymiarowego parametru $L_R/\Delta x$ opisującego rozdzielczość promienia Rossby'ego na siatce. Oba wykresy pozwalają ocenić, w jakim zakresie krok czasowy i rozdzielczość przestrzenna gwarantują poprawne odtworzenie teoretycznej prędkości fali Kelvina. 
+    
+    \begin{figure}[H]
+        \centering
+        \begin{subfigure}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{kelvin_time_convergence_speed_vs_dt.pdf}
+            \caption{Zależność $c_{\mathrm{num}}/c$ od kroku czasowego $\Delta t$.}
+            \label{fig:kelvin-time-convergence}
+        \end{subfigure}
+        \hfill
+        \begin{subfigure}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\linewidth]{kelvin_space_convergence_speed_vs_res.pdf}
+            \caption{Zależność $c_{\mathrm{num}}/c$ od $L_R/\Delta x$.}
+            \label{fig:kelvin-space-convergence}
+        \end{subfigure}
+        \caption{
+            Zbieżność numerycznej prędkości fali Kelvina $c_{\mathrm{num}}$
+            względem wartości teoretycznej $c=\sqrt{gH}$ w funkcji
+            parametrów numerycznych schematu: kroku czasowego $\Delta t$
+            (panel~\subref{fig:kelvin-time-convergence}) oraz rozdzielczości
+            przestrzennej $L_R/\Delta x$
+            (panel~\subref{fig:kelvin-space-convergence}).
+        }
+        \label{fig:kelvin-convergence-both}
+    \end{figure}
+
+
+\section{Wnioski}
+
+    Przeprowadzone obliczenia pokazały, że korzystając z równań dynamiki płynu w przybliżeniu płytkiej wody można numerycznie odtworzyć brzegową falę Kelvina w prostokątnym basenie oceanicznym. Uzyskane pola anomalii poziomu morza i prędkości mają wszystkie charakterystyczne cechy fali Kelvina: maksimum amplitudy zlokalizowane przy brzegu, wykładnicze tłumienie sygnału w głąb oceanu oraz przepływ wzdłuż linii brzegowej z silnie stłumioną składową prostopadłą. Diagramy Hovmöllera potwierdzają propagację sygnału w jednym kierunku wzdłuż brzegu z prędkością zbliżoną do teoretycznej prędkości fazowej. \\
+    
+    Analiza zbieżności pokazuje, że wpływ kroku czasowego na wartość $|c_{\text{num}}|/c$ jest niewielki, o ile zachowany jest warunek CFL, natomiast kluczowe znaczenie ma rozdzielczość przestrzenna: dla zbyt grubej siatki (małe $L_R/\Delta x$) prędkość fali jest niedoszacowana i dopiero dla wartości $L_R/\Delta x$ rzędu kilkunastu lub większych stosunek ten zbliża się do jedności. \\
+    
+    Podsumowując, odpowiedź na pytanie postawione w części wstępnej jest pozytywna: równania płytkiej wody z odpowiednio dobranymi warunkami brzegowymi pozwalają numerycznie odtworzyć brzegową falę Kelvina, a dokładność odtworzonej prędkości propagacji zależy przede wszystkim od rozdzielczości przestrzennej siatki numerycznej, przy zachowaniu rozsądnie małego kroku czasowego zgodnego z kryterium CFL.
+
+\end{document}
